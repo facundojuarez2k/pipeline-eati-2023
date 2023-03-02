@@ -65,7 +65,8 @@ jobs:
                 mv index.html ./build/index.html
             - name: "Deploy to remote"
               run: |
-                  curl -v --stderr deploy.log -w "%{http_code}\n" -F password=${{ secrets.SERVER_PASSWORD }} -F file=@build/index.html -F user=${{ secrets.SERVER_USERNAME }} ${{ env.DEPLOY_URL }}
+                  result=$(curl -v --stderr deploy.log -w "%{http_code}\n" -F password=${{ secrets.SERVER_PASSWORD }} -F file=@build/index.html -F user=${{ secrets.SERVER_USERNAME }} ${{ env.DEPLOY_URL }})
+                  echo $response | tail -n 1 | grep "200" > /dev/null || (echo "Error en la solicitud"; exit 1)
             - name: "Upload logs"
               uses: actions/upload-artifact@v3
               with:
