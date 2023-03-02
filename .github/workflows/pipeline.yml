@@ -45,7 +45,7 @@ jobs:
               uses: actions/upload-artifact@v3
               with:
                   name: ${{ env.ARTIFACT_NAME }}
-                  path: ${{ env.PROGRAM_OUTPUT_PATH }}
+                  path: ${{ env.ARTIFACT_PATH }}
     deploy:
         runs-on: ubuntu-latest
         name: "Deploy to production"
