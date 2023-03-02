@@ -3,6 +3,7 @@ Program's main module
 '''
 
 import os
+import sys
 
 BUILD_DIR = os.path.join(os.getcwd(), "build")
 FILE_PATH = os.path.join(BUILD_DIR, "index.html")
@@ -32,3 +33,6 @@ def main():
     # Create HTML file
     with open(FILE_PATH, "w", encoding="UTF-8") as file_pointer:
         file_pointer.write(HTML_CONTENT)
+
+if __name__ == '__main__':
+    sys.exit(main())
