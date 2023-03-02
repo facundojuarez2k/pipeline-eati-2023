@@ -1,0 +1,64 @@
+name: Pipeline
+
+on:
+  push:
+    branches: [main]
+
+env:
+  ARTIFACT_PATH: "build/"
+  ARTIFACT_NAME: "build-dir"
+  DEPLOY_URL: "https://cs.uns.edu.ar/~jose.moyano/index.php"
+
+jobs:
+  linting:
+    runs-on: ubuntu-latest
+    name: "Run python linters"
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v3
+      - name: "Install python modules"
+        run: |
+        python -m install pip --upgrade
+        pip install -r requirements.txt
+      - name: "Run flake8"
+        run: flake8 main.py
+      - name: "Run pylint"
+        run: pylint main.py
+  unit-test:
+    runs-on: ubuntu-latest
+    name: "Run unit tests"
+    needs: [linting]
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v3
+      - name: "Run unit tests"
+        run: python -m unittest --verbose --failfast
+  create-artifact:
+    runs-on: ubuntu-latest
+    name: "Create artifact"
+    needs: [unit-test]
+    steps:
+      - name: "Run program"
+        run: python main.py
+      - name: "Upload artifact"
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.PROGRAM_OUTPUT_PATH }}
+  deploy:
+    runs-on: ubuntu-latest
+    name: "Deploy to production"
+    needs: [create-artifact]
+    steps:
+      - name: "Download artifact"
+        uses: actions/download-action@v3
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+      - name: "Deploy to remote"
+        run: | 
+          curl -v --stderr deploy.log -w "%{http_code}\n" -F password=${{ secrets.SERVER_PASSWORD }} -F file=@build/index.html -F user=${{ secrets.SERVER_USERNAME }} ${{ env.DEPLOY_URL }}
+      - name: "Upload logs"
+        uses: actions/upload-artifact@v3
+        with:
+          name: logs
+          path: "deploy.log"
