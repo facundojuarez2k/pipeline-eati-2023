@@ -5,7 +5,7 @@ on:
         branches: [main]
 
 env:
-    ARTIFACT_PATH: "build/"
+    ARTIFACT_PATH: "build/index.html"
     ARTIFACT_NAME: "build-dir"
 
 jobs:
@@ -59,6 +59,10 @@ jobs:
               uses: actions/download-artifact@v3
               with:
                   name: ${{ env.ARTIFACT_NAME }}
+            - name: "Move file"
+              run: |
+                mkdir -p build
+                mv index.html ./build/index.html
             - name: "Deploy to remote"
               run: |
                   curl -v --stderr deploy.log -w "%{http_code}\n" -F password=${{ secrets.SERVER_PASSWORD }} -F file=@build/index.html -F user=${{ secrets.SERVER_USERNAME }} ${{ env.DEPLOY_URL }}
