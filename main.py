@@ -34,5 +34,6 @@ def main():
     with open(FILE_PATH, "w", encoding="UTF-8") as file_pointer:
         file_pointer.write(HTML_CONTENT)
 
+
 if __name__ == '__main__':
     sys.exit(main())
