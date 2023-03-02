@@ -7,7 +7,6 @@ on:
 env:
     ARTIFACT_PATH: "build/"
     ARTIFACT_NAME: "build-dir"
-    DEPLOY_URL: "https://cs.uns.edu.ar/~jose.moyano/index.php"
 
 jobs:
     linting:
@@ -38,6 +37,8 @@ jobs:
         name: "Create artifact"
         needs: [unit-test]
         steps:
+            - name: "Checkout repository"
+              uses: actions/checkout@v3
             - name: "Run program"
               run: python main.py
             - name: "Upload artifact"
@@ -49,6 +50,8 @@ jobs:
         runs-on: ubuntu-latest
         name: "Deploy to production"
         needs: [create-artifact]
+        env:
+            DEPLOY_URL: "https://cs.uns.edu.ar/~jose.moyano/index.php"
         steps:
             - name: "Download artifact"
               uses: actions/download-action@v3
